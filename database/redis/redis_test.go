@@ -22,7 +22,7 @@ const (
 	ValueB  = "TestValueB"
 )
 
-var client *Redis
+var client *Client
 
 type Struct struct {
 	A int64

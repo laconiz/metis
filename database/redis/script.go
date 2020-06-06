@@ -7,7 +7,7 @@ import (
 
 type Eval struct {
 	script *Script
-	client *Redis
+	client *Client
 }
 
 func (eval *Eval) Load() error {

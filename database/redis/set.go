@@ -4,7 +4,7 @@ import "github.com/laconiz/metis/database/redis/decoder"
 
 type Set struct {
 	key    string
-	client *Redis
+	client *Client
 }
 
 /*

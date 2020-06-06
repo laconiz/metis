@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func New(option *Option) (*Redis, error) {
+func New(option *Option) (*Client, error) {
 
 	dial := func() (redis.Conn, error) {
 		return redis.Dial(
@@ -18,7 +18,7 @@ func New(option *Option) (*Redis, error) {
 		)
 	}
 
-	redis := &Redis{
+	client := &Client{
 		pool: &redis.Pool{
 			Dial:            dial,
 			TestOnBorrow:    nil,
@@ -31,21 +31,21 @@ func New(option *Option) (*Redis, error) {
 		option: option,
 	}
 
-	if _, err := redis.Exec(PING); err != nil {
+	if _, err := client.Exec(PING); err != nil {
 		return nil, err
 	}
 
-	return redis, nil
+	return client, nil
 }
 
-type Redis struct {
+type Client struct {
 	pool   *redis.Pool
 	option *Option
 }
 
-func (redis *Redis) Exec(cmd string, args ...interface{}) (interface{}, error) {
+func (client *Client) Exec(cmd string, args ...interface{}) (interface{}, error) {
 
-	conn := redis.pool.Get()
+	conn := client.pool.Get()
 	defer conn.Close()
 
 	params, err := decoder.Params(args)
@@ -55,40 +55,40 @@ func (redis *Redis) Exec(cmd string, args ...interface{}) (interface{}, error) {
 
 	reply, err := conn.Do(cmd, params...)
 
-	if redis.option.Logger != nil {
+	if client.option.Logger != nil {
 		log := &ExecLog{Command: cmd, Request: params, Response: reply, Error: err}
-		redis.option.Logger.Debug(log)
+		client.option.Logger.Debug(log)
 	}
 
 	return reply, err
 }
 
-func (redis *Redis) Key() *Key {
-	return &Key{client: redis}
+func (client *Client) Key() *Key {
+	return &Key{client: client}
 }
 
-func (redis *Redis) Hash(key string) *Hash {
-	return &Hash{client: redis, key: key}
+func (client *Client) Hash(key string) *Hash {
+	return &Hash{client: client, key: key}
 }
 
-func (redis *Redis) ZOrder(key string) *ZOrder {
-	return &ZOrder{client: redis, key: key}
+func (client *Client) ZOrder(key string) *ZOrder {
+	return &ZOrder{client: client, key: key}
 }
 
-func (redis *Redis) Set(key string) *Set {
-	return &Set{client: redis, key: key}
+func (client *Client) Set(key string) *Set {
+	return &Set{client: client, key: key}
 }
 
-func (redis *Redis) Eval(script *Script) *Eval {
-	return &Eval{client: redis, script: script}
+func (client *Client) Eval(script *Script) *Eval {
+	return &Eval{client: client, script: script}
 }
 
-func (redis *Redis) Singleton(key string) *Singleton {
-	return &Singleton{client: redis, key: key}
+func (client *Client) Singleton(key string) *Singleton {
+	return &Singleton{client: client, key: key}
 }
 
-func (redis *Redis) Atomic(key string) *Atomic {
-	return (&Atomic{redis: redis, key: key}).
+func (client *Client) Atomic(key string) *Atomic {
+	return (&Atomic{client: client, key: key}).
 		Expired(time.Second * 3).
 		Timeout(time.Second * 6).
 		Ticker(time.Millisecond * 50)

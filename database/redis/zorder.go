@@ -6,7 +6,7 @@ import (
 
 type ZOrder struct {
 	key    string
-	client *Redis
+	client *Client
 }
 
 /*

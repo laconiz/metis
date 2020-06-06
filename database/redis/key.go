@@ -5,7 +5,7 @@ import (
 )
 
 type Key struct {
-	client *Redis
+	client *Client
 }
 
 /*

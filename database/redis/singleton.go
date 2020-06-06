@@ -6,7 +6,7 @@ import (
 
 type Singleton struct {
 	key    string
-	client *Redis
+	client *Client
 }
 
 func (singleton *Singleton) Exec(handler func()) (bool, error) {

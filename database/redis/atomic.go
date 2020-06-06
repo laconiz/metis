@@ -19,7 +19,7 @@ type Atomic struct {
 	ticker  time.Duration
 	timeout time.Duration
 	value   string
-	redis   *Redis
+	client  *Client
 }
 
 func (atomic *Atomic) Expired(duration time.Duration) *Atomic {
@@ -46,7 +46,7 @@ func (atomic *Atomic) Lock() error {
 
 	deadline := time.Now().Add(atomic.timeout)
 
-	key := atomic.redis.Key()
+	key := atomic.client.Key()
 
 	for {
 
@@ -67,7 +67,7 @@ func (atomic *Atomic) Lock() error {
 
 func (atomic *Atomic) Unlock() error {
 
-	script := atomic.redis.Eval(scriptAtomicUnlock)
+	script := atomic.client.Eval(scriptAtomicUnlock)
 	reply, err := script.Exec(atomic.key, atomic.value)
 
 	if ok, err := redis.Bool(reply, err); err != nil {
@@ -89,7 +89,7 @@ func (atomic *Atomic) Exec(handler func()) (ok bool, err error) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			if logger := atomic.redis.option.Logger; logger != nil {
+			if logger := atomic.client.option.Logger; logger != nil {
 				logger.Data(err).Error("execute error")
 			}
 		}

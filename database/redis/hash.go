@@ -7,7 +7,7 @@ import (
 
 type Hash struct {
 	key    string
-	client *Redis
+	client *Client
 }
 
 /*
