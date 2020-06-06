@@ -14,10 +14,12 @@ func TestHash_Set(t *testing.T) {
 
 	assert(hash.Set(MemberA, ValueA) == nil)
 	var value string
-	assert(hash.Get(MemberA, &value) == nil, value == ValueA)
+	ok, err := hash.Get(MemberA, &value)
+	assert(err == nil, ok, value == ValueA)
 
 	assert(hash.Delete(MemberA) == nil)
-	assert(hash.Get(MemberA, &value) == nil, value != ValueA)
+	ok, err = hash.Get(MemberA, &value)
+	assert(err == nil, !ok, value != ValueA)
 
 	assert(client.Key().Delete(KeyA) == nil)
 }
@@ -26,17 +28,17 @@ func TestHash_Get(t *testing.T) {
 
 	assert(client.Key().Delete(KeyA) == nil)
 
-	assert(client.Key().Set(MemberA, ValueA) == nil)
-
 	hash := client.Hash(KeyA)
 
 	var value string
-	assert(hash.Get(MemberA, &value) == nil)
+	ok, err := hash.Get(MemberA, &value)
+	assert(err == nil, !ok)
 
 	assert(client.Key().Delete(KeyA) == nil)
 
 	hash.Set(MemberA, ValueA)
-	assert(hash.Get(MemberA, &value) == nil, value == ValueA)
+	ok, err = hash.Get(MemberA, &value)
+	assert(err == nil, ok, value == ValueA)
 
 	assert(client.Key().Delete(KeyA) == nil)
 }

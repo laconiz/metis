@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"github.com/gomodule/redigo/redis"
 	"github.com/laconiz/metis/database/redis/decoder"
 )
 
@@ -57,9 +56,10 @@ func (hash *Hash) Set(field, value interface{}) error {
 		给定域的值.
 		当给定域不存在或是给定 key 不存在时, 返回 nil .
 */
-func (hash *Hash) Get(field, value interface{}) error {
+func (hash *Hash) Get(field, value interface{}) (bool, error) {
 	reply, err := hash.client.Exec(HGET, hash.key, field)
-	return decoder.Decode(value, reply, err)
+	err = decoder.Decode(value, reply, err)
+	return reply != nil && err == nil, err
 }
 
 /*
@@ -134,14 +134,12 @@ func (hash *Hash) Consume(field interface{}, increment int64) (int64, bool, erro
 
 	result := &consumeResult{}
 	eval := hash.client.Eval(scriptHashConsume)
-	reply, err := eval.Exec(hash.key, field, increment)
+	reply, err := eval.Do(hash.key, field, increment)
 	err = decoder.Decode(result, reply, err)
 	return result.Value, result.Success, err
 }
 
-var scriptHashConsume = &Script{Name: "HashConsume", Script: redis.NewScript(1, luaConsume)}
-
-var luaConsume = `
+var scriptHashConsume = NewScript("HashConsume", 1, `
 
 	local new = redis.call('HINCRBY', KEYS[1], ARGV[1], ARGV[2])
 	if new >= 0 then
@@ -150,4 +148,4 @@ var luaConsume = `
 
 	new = redis.call('HINCRBY', KEYS[1], ARGV[1], -ARGV[2])
 	return {new, 0}
-`
+`)

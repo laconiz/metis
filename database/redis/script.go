@@ -18,7 +18,7 @@ func (eval *Eval) Load() error {
 	return eval.script.Script.Load(conn)
 }
 
-func (eval *Eval) Exec(args ...interface{}) (interface{}, error) {
+func (eval *Eval) Do(args ...interface{}) (interface{}, error) {
 
 	conn := eval.client.pool.Get()
 	defer conn.Close()
@@ -36,6 +36,15 @@ func (eval *Eval) Exec(args ...interface{}) (interface{}, error) {
 	}
 
 	return reply, err
+}
+
+func (eval *Eval) Exec(value interface{}, args ...interface{}) error {
+	reply, err := eval.Do(args...)
+	return decoder.Decode(value, reply, err)
+}
+
+func NewScript(name string, keys int, src string) *Script {
+	return &Script{Name: name, Script: redis.NewScript(keys, src)}
 }
 
 type Script struct {

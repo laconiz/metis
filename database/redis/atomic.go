@@ -68,7 +68,7 @@ func (atomic *Atomic) Lock() error {
 func (atomic *Atomic) Unlock() error {
 
 	script := atomic.client.Eval(scriptAtomicUnlock)
-	reply, err := script.Exec(atomic.key, atomic.value)
+	reply, err := script.Do(atomic.key, atomic.value)
 
 	if ok, err := redis.Bool(reply, err); err != nil {
 		return err
@@ -100,11 +100,11 @@ func (atomic *Atomic) Exec(handler func()) (ok bool, err error) {
 	return
 }
 
-var scriptAtomicUnlock = &Script{Name: "AtomicUnlock", Script: redis.NewScript(1, luaAtomicUnlock)}
+var scriptAtomicUnlock = NewScript("AtomicUnlock", 1, `
 
-var luaAtomicUnlock = `
 	if redis.call('GET', KEYS[1]) == ARGV[1] then
 		return redis.call('DEL', KEYS[1])
 	end
+
 	return 0
-`
+`)

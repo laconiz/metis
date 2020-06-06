@@ -15,7 +15,6 @@ func assert(assertions ...bool) {
 
 const (
 	KeyA    = "TestKeyA"
-	KeyB    = "TestKeyB"
 	MemberA = "TestMemberA"
 	MemberB = "TestMemberB"
 	ValueA  = "TestValueA"

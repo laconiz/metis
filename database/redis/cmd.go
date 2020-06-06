@@ -23,13 +23,15 @@ const (
 	HMGET   = "HMGET"
 	HGETALL = "HGETALL"
 	HINCRBY = "HINCRBY"
+	HEXISTS = "HEXISTS"
 
 	// set
-	SADD     = "SADD"
-	SREM     = "SREM"
-	SMEMBERS = "SMEMBERS"
+	SADD      = "SADD"
+	SREM      = "SREM"
+	SMEMBERS  = "SMEMBERS"
+	SISMEMBER = "SISMEMBER"
 
-	// zorder
+	// sorted set
 	ZINCRBY    = "ZINCRBY"
 	ZREVRANGE  = "ZREVRANGE"
 	ZSCORE     = "ZSCORE"
