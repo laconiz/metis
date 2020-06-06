@@ -20,3 +20,5 @@ type Logger interface {
 	Fatal(args ...interface{})
 	Fatalf(format string, args ...interface{})
 }
+
+const Module = "module"
