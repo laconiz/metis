@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func New(option *Option) (*Client, error) {
+func New(option Option) (*Client, error) {
 
 	dial := func() (redis.Conn, error) {
 		return redis.Dial(
@@ -28,7 +28,7 @@ func New(option *Option) (*Client, error) {
 			Wait:            true,
 			MaxConnLifetime: 0,
 		},
-		option: option,
+		option: &option,
 	}
 
 	if _, err := client.Exec(PING); err != nil {
