@@ -48,7 +48,7 @@ func init() {
 	}
 
 	var err error
-	if client, err = New(&conf); err != nil {
+	if client, err = New(conf); err != nil {
 		panic(err)
 	}
 }

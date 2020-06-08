@@ -96,7 +96,12 @@ func Int(recv interface{}, reply interface{}) error {
 		err = nil
 	}
 
-	reflect.ValueOf(recv).Elem().SetInt(value)
+	elem := reflect.ValueOf(recv).Elem()
+	elem.SetInt(value)
+	if elem.Int() != value {
+		err = fmt.Errorf("value overflow: %d != %d", elem.Int(), value)
+	}
+
 	return err
 }
 
@@ -107,6 +112,11 @@ func Uint(recv interface{}, reply interface{}) error {
 		err = nil
 	}
 
-	reflect.ValueOf(recv).Elem().SetUint(value)
+	elem := reflect.ValueOf(recv).Elem()
+	elem.SetUint(value)
+	if elem.Uint() != value {
+		err = fmt.Errorf("value overflow: %d != %d", elem.Uint(), value)
+	}
+
 	return err
 }
