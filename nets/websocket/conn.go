@@ -34,6 +34,5 @@ func (conn *Conn) Write(stream []byte) error {
 }
 
 func (conn *Conn) Close() error {
-	log.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 	return conn.conn.Close()
 }

@@ -54,7 +54,6 @@ func (ses *Session) Data() *sync.Map {
 }
 
 func (ses *Session) Close() error {
-	ses.logger.Error("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
 	return ses.queue.Close()
 }
 

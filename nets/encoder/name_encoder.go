@@ -7,7 +7,7 @@ import (
 	"github.com/laconiz/metis/nets/packet"
 )
 
-const Sep = '&'
+const Sep = '-'
 
 type NameEncoder struct {
 }

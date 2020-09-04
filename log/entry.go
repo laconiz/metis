@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"github.com/laconiz/metis/log/context"
+	"os"
 	"time"
 )
 
@@ -83,10 +84,12 @@ func (entry *Entry) Errorf(format string, args ...interface{}) {
 
 func (entry *Entry) Fatal(args ...interface{}) {
 	entry.Log(FATAL, args...)
+	os.Exit(1)
 }
 
 func (entry *Entry) Fatalf(format string, args ...interface{}) {
 	entry.Logf(FATAL, format, args...)
+	os.Exit(1)
 }
 
 func (entry *Entry) Log(level Level, args ...interface{}) {

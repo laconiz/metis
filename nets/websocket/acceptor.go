@@ -71,7 +71,7 @@ func (listener *Listener) upgrade(context *gin.Context) {
 	request := context.Request
 
 	// 升级会话
-	conn, err := upgrader.Upgrade(context.Writer, request, request.Header)
+	conn, err := upgrader.Upgrade(context.Writer, request, nil)
 	if err != nil {
 		return
 	}
