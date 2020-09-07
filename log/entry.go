@@ -92,6 +92,14 @@ func (entry *Entry) Fatalf(format string, args ...interface{}) {
 	os.Exit(1)
 }
 
+func (entry *Entry) Print(args ...interface{}) {
+	entry.Log(INFO, args...)
+}
+
+func (entry *Entry) Printf(format string, args ...interface{}) {
+	entry.Logf(INFO, format, args...)
+}
+
 func (entry *Entry) Log(level Level, args ...interface{}) {
 
 	if !entry.level.Enable(level) || !entry.strap.Enable(level) {

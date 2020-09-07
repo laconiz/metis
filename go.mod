@@ -12,5 +12,5 @@ require (
 	github.com/olivere/elastic/v7 v7.0.16
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.5.1 // indirect
-	gorm.io/gorm v1.20.0
+	gorm.io/gorm v1.20.0 // indirect
 )
