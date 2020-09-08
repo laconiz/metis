@@ -6,6 +6,7 @@ import (
 	"github.com/laconiz/metis/nets/codec"
 	"hash/fnv"
 	"reflect"
+	"sort"
 )
 
 type MetaID uint32
@@ -122,6 +123,19 @@ func MetaByMsg(msg interface{}) *Meta {
 	}
 
 	return MetaByType(typo)
+}
+
+func MetaList() (ret []*Meta) {
+
+	for _, meta := range nameMap {
+		ret = append(ret, meta)
+	}
+
+	sort.Slice(ret, func(i, j int) bool {
+		return ret[i].name < ret[j].name
+	})
+
+	return
 }
 
 var (
