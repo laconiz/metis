@@ -13,10 +13,14 @@ import (
 
 var unique uint64
 
+func NewID() uint64 {
+	return atomic.AddUint64(&unique, 1)
+}
+
 func New(conn Conn, option *Option, logger log.Logger) *Session {
 
 	ses := &Session{
-		id:      atomic.AddUint64(&unique, 1),
+		id:      NewID(),
 		conn:    conn,
 		queue:   queue.New(option.Queue),
 		cipher:  option.Cipher.New(),

@@ -33,7 +33,7 @@ func (data *Data) value(value interface{}) {
 	typo := reflect.TypeOf(value)
 	key := "nil"
 	if typo != nil {
-		key = typo.String()
+		key = typo.Name()
 	}
 
 	count := data.counter[key]
@@ -42,7 +42,7 @@ func (data *Data) value(value interface{}) {
 		data.values[key] = value
 	case 1:
 		first := int32(0)
-		data.values[index(key, first)] = value
+		data.values[index(key, first)] = data.values[key]
 		delete(data.values, key)
 		data.values[index(key, count)] = value
 	default:
