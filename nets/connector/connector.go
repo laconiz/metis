@@ -60,14 +60,14 @@ func (con *Connector) Run() {
 
 func (con *Connector) connect() {
 
-	con.logger.Data(con.addr).Info("connect")
+	con.logger.Data("addr", con.addr).Info("connect")
 
 	conn, err := con.dialer(con.addr)
 	ses := session.New(conn, &con.option.Session, con.logger)
 
 	if err != nil {
 
-		con.logger.Data(err).Error("dial error")
+		con.logger.Data("error", err).Error("dial error")
 
 		// 延时重连
 		go con.delay()
@@ -125,7 +125,7 @@ func (con *Connector) delay() {
 
 		delay := delays[index]
 
-		con.logger.Data(delay.String()).Info("reconnect")
+		con.logger.Data("delay", delay.String()).Info("reconnect")
 
 		// 等待
 		<-time.After(delay)

@@ -74,12 +74,12 @@ func (acc *Acceptor) Run() {
 		return
 	}
 
-	acc.logger.Data(acc.addr).Info("accept")
+	acc.logger.Data("addr", acc.addr).Info("accept")
 
 	// 启动侦听器
 	listener, err := acc.dialer(acc.addr)
 	if err != nil {
-		acc.logger.Data(err).Error("dial error")
+		acc.logger.Data("error", err).Error("dial error")
 		return
 	}
 	acc.listener = listener
@@ -92,7 +92,7 @@ func (acc *Acceptor) Run() {
 			if err != nil {
 				// 非正常关闭
 				if !strings.Contains(err.Error(), StrClosed) {
-					acc.logger.Data(err).Error("accept error")
+					acc.logger.Data("error", err).Error("accept error")
 				}
 				break
 			}

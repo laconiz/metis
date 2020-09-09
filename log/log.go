@@ -9,7 +9,7 @@ import (
 type Log struct {
 	Level   Level            // 等级
 	Time    time.Time        // 事件
-	Data    *context.Data    // 数据
+	Data    *context.Context // 数据
 	Context *context.Context // 上下文
 	Message string           // 格式化信息
 }

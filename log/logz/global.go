@@ -26,8 +26,8 @@ func Fields(fields context.Fields) log.Logger {
 	return global.Fields(fields)
 }
 
-func Data(data ...interface{}) log.Logger {
-	return global.Data(data...)
+func Data(key string, value interface{}) log.Logger {
+	return global.Data(key, value)
 }
 
 func Debug(args ...interface{}) {

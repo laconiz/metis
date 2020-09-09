@@ -15,15 +15,15 @@ type Strap interface {
 func New(strap Strap) Logger {
 	return &Entry{
 		level:   DEBUG,
-		data:    context.NewData(),
-		context: context.NewContext(),
+		data:    context.New(),
+		context: context.New(),
 		strap:   strap,
 	}
 }
 
 type Entry struct {
 	level   Level
-	data    *context.Data
+	data    *context.Context
 	context *context.Context
 	strap   Strap
 }
@@ -44,9 +44,9 @@ func (entry *Entry) Fields(fields context.Fields) Logger {
 	return &copy
 }
 
-func (entry *Entry) Data(values ...interface{}) Logger {
+func (entry *Entry) Data(key string, value interface{}) Logger {
 	copy := *entry
-	copy.data = entry.data.Value(values...)
+	copy.data = entry.data.Fields(context.Fields{key: value})
 	return &copy
 }
 
@@ -90,14 +90,6 @@ func (entry *Entry) Fatal(args ...interface{}) {
 func (entry *Entry) Fatalf(format string, args ...interface{}) {
 	entry.Logf(FATAL, format, args...)
 	os.Exit(1)
-}
-
-func (entry *Entry) Print(args ...interface{}) {
-	entry.Log(INFO, args...)
-}
-
-func (entry *Entry) Printf(format string, args ...interface{}) {
-	entry.Logf(INFO, format, args...)
 }
 
 func (entry *Entry) Log(level Level, args ...interface{}) {

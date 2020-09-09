@@ -88,32 +88,31 @@ func (invoker *Invoker) Handle(node *Node, handler ioc.Invoker) gin.HandlerFunc 
 	return func(ctx *gin.Context) {
 
 		now := time.Now()
-		req, resp, err := handler(ctx)
-		entry := logger.Data(session.NewID(), time.Since(now).String())
+		in, out, err := handler(ctx)
+		entry := logger.Data("session", session.NewID()).Data("duration", time.Since(now).String())
 
 		if err != nil {
-			entry.Data(err).Info("invoke error")
+			entry.Data("error", err).Info("invoke error")
 			return
 		}
 
 		var requests []interface{}
-		for _, value := range req {
+		for _, value := range in {
 			if value.CanInterface() {
 				requests = append(requests, value.Interface())
 			}
 		}
 
 		var responses []interface{}
-		for _, value := range resp {
+		for _, value := range out {
 			if value.CanInterface() {
 				responses = append(responses, value.Interface())
 			}
 		}
 
-		entry = entry.Data(requests)
-		ctx.JSON(http.StatusOK, resp[0].Interface())
-
-		entry.Data(resp).Info("execute success")
+		entry = entry.Data("request", requests)
+		ctx.JSON(http.StatusOK, out[0].Interface())
+		entry.Data("response", responses).Info("execute success")
 	}
 }
 

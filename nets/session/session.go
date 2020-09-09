@@ -66,7 +66,7 @@ func (ses *Session) Send(msg interface{}) error {
 	// 打包
 	pkt, err := ses.encoder.Marshal(msg)
 	if err != nil {
-		ses.logger.Data(msg, err).Error("marshal error")
+		ses.logger.Data("message", msg).Data("error", err).Error("marshal error")
 		return err
 	}
 
@@ -89,7 +89,7 @@ func (ses *Session) read() {
 		// 读取流
 		stream, err := ses.conn.Read()
 		if err != nil {
-			ses.logger.Data(err).Info("read error")
+			ses.logger.Data("error", err).Info("read error")
 			break
 		}
 
@@ -107,7 +107,7 @@ func (ses *Session) read() {
 			return
 		}
 
-		ses.logger.Data(string(raw)).Debug("recv message")
+		ses.logger.Data("raw", string(raw)).Debug("recv message")
 		ses.Invoke(&event.Event{Ses: ses, Packet: pkt})
 	}
 }
@@ -143,14 +143,14 @@ func (ses *Session) write() {
 			break
 		}
 
-		ses.logger.Data(string(raw)).Debug("send message")
+		ses.logger.Data("raw", string(raw)).Debug("send message")
 	}
 }
 
 // 启动会话
 func (ses *Session) Run(callback func(*Session)) {
 
-	ses.logger.Data(ses.Addr()).Info("connected")
+	ses.logger.Data("addr", ses.Addr()).Info("connected")
 
 	// 运行写入线程
 	go func() {
@@ -178,7 +178,7 @@ func (ses *Session) Invoke(event *event.Event) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			ses.logger.Data(err).Error("invoke panic")
+			ses.logger.Data("error", err).Error("invoke panic")
 		}
 	}()
 

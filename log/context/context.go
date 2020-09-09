@@ -7,7 +7,7 @@ import (
 
 type Fields map[string]interface{}
 
-func NewContext() *Context {
+func New() *Context {
 	return &Context{fields: Fields{}}
 }
 
@@ -18,14 +18,18 @@ type Context struct {
 
 func (context *Context) Fields(fields Fields) *Context {
 
-	copy := NewContext()
+	copy := New()
 
 	for key, value := range context.fields {
 		copy.fields[key] = value
 	}
 
 	for key, value := range fields {
-		copy.fields[key] = value
+		if err, ok := value.(error); ok {
+			copy.fields[key] = err.Error()
+		} else {
+			copy.fields[key] = value
+		}
 	}
 
 	return copy

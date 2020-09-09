@@ -49,13 +49,13 @@ func (acceptor *Acceptor) Run() {
 	acceptor.running = true
 
 	acceptor.listener = &http.Server{Addr: acceptor.listener.Addr, Handler: acceptor.listener.Handler}
-	acceptor.logger.Data(acceptor.listener.Addr).Info("start")
+	acceptor.logger.Data("addr", acceptor.listener.Addr).Info("start")
 
 	go func() {
 
 		err := acceptor.listener.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			acceptor.logger.Data(err).Error("listen error")
+			acceptor.logger.Data("error", err).Error("listen error")
 		}
 
 		acceptor.mutex.Lock()
@@ -79,7 +79,7 @@ func (acceptor *Acceptor) Stop() {
 
 	context, _ := context.WithTimeout(context.Background(), time.Second*2)
 	if err := acceptor.listener.Shutdown(context); err != nil {
-		acceptor.logger.Data(err).Error("shutdown error")
+		acceptor.logger.Data("error", err).Error("shutdown error")
 	}
 }
 
