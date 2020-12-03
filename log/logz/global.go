@@ -3,10 +3,9 @@ package logz
 import (
 	"github.com/laconiz/metis/log"
 	"github.com/laconiz/metis/log/context"
-	"os"
 )
 
-var global = log.NewEntry(log.NewHook(log.Text()).Writer(log.NewWriter(log.DEBUG, os.Stderr)))
+var global = log.NewEntry(log.NewHook(log.Text()).Writer(log.StdWriter))
 
 func Global() log.Logger {
 	return global
