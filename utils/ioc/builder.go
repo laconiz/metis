@@ -44,5 +44,5 @@ func NewBuilder(function interface{}) (*Builder, error) {
 		return nil, fmt.Errorf(errFormatter, errType)
 	}
 
-	return &Builder{Type: typo, Func: function}, nil
+	return &Builder{Type: typo.Out(0), Func: function}, nil
 }

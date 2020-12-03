@@ -40,7 +40,7 @@ func (encoder *NameEncoder) Unmarshal(stream []byte) (*packet.Packet, error) {
 
 	meta := packet.MetaByName(string(args[0]))
 	if meta == nil {
-		return nil, errors.New("meta cannot be found")
+		return nil, errors.New("meta cannot be found: " + string(args[0]))
 	}
 
 	msg, err := meta.Decode(args[1])

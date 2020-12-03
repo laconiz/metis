@@ -2,13 +2,14 @@ package websocket
 
 import (
 	"github.com/gorilla/websocket"
-	"log"
+	"sync"
 	"time"
 )
 
 type Conn struct {
 	conn *websocket.Conn
 	addr string
+	data *sync.Map
 }
 
 func (conn *Conn) Addr() string {
@@ -23,9 +24,6 @@ func (conn *Conn) Deadline(time time.Time) error {
 
 func (conn *Conn) Read() ([]byte, error) {
 	_, raw, err := conn.conn.ReadMessage()
-	if err != nil {
-		log.Println(err)
-	}
 	return raw, err
 }
 
@@ -35,4 +33,8 @@ func (conn *Conn) Write(stream []byte) error {
 
 func (conn *Conn) Close() error {
 	return conn.conn.Close()
+}
+
+func (conn *Conn) Data() *sync.Map {
+	return conn.data
 }

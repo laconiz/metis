@@ -99,6 +99,11 @@ func (acc *Acceptor) Run() {
 
 			ses := session.New(conn, &acc.option.Session, acc.logger)
 
+			conn.Data().Range(func(key, value interface{}) bool {
+				ses.Data().Store(key, value)
+				return true
+			})
+
 			// 添加会话
 			acc.mutex.Lock()
 			acc.sessions[ses.ID()] = ses

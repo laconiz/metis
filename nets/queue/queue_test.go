@@ -19,14 +19,14 @@ func TestQueue_Push(t *testing.T) {
 		}
 	}
 
-	if queue.Push(cap) != errOverflow {
+	if queue.Push(cap) != ErrOverFlow {
 		t.FailNow()
 	}
 
 	queue.Close()
 
 	for i := 0; i < cap; i++ {
-		if queue.Push(cap) != errClosed {
+		if queue.Push(cap) != ErrClosed {
 			t.FailNow()
 		}
 	}
@@ -105,7 +105,7 @@ func TestQueue_Close(t *testing.T) {
 		t.FailNow()
 	}
 
-	if queue.Close() != errClosed {
+	if queue.Close() != ErrClosed {
 		t.FailNow()
 	}
 

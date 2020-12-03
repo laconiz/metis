@@ -44,4 +44,8 @@ func (date Date) UnmarshalJSON(raw []byte) error {
 	return nil
 }
 
+func (date Date) Day() int {
+	return date.time.Year()*10000 + (int(date.time.Month())+1)*100 + date.time.Day()
+}
+
 const Layout = "2006-01-02 15:04:05.000 Z0700"

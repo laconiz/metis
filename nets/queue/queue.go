@@ -39,13 +39,13 @@ func (queue *Queue) Push(event interface{}) error {
 func (queue *Queue) push(event interface{}) error {
 
 	if queue.closed {
-		return errClosed
+		return ErrClosed
 	}
 
 	list := queue.list
 	capacity := queue.capacity
 	if capacity > 0 && list.Len() >= capacity {
-		return errOverflow
+		return ErrOverFlow
 	}
 
 	list.PushBack(event)
@@ -73,6 +73,23 @@ func (queue *Queue) Pop() (interface{}, bool) {
 	return nil, true
 }
 
+func (queue *Queue) CloseWithEmpty() error {
+
+	queue.mutex.Lock()
+	if queue.list.Len() > 0 {
+		queue.mutex.Unlock()
+		return nil
+	}
+
+	err := queue.close()
+	queue.mutex.Unlock()
+
+	if err == nil {
+		queue.cond.Signal()
+	}
+	return err
+}
+
 func (queue *Queue) Close() error {
 
 	queue.mutex.Lock()
@@ -88,12 +105,12 @@ func (queue *Queue) Close() error {
 func (queue *Queue) close() error {
 
 	if queue.closed {
-		return errClosed
+		return ErrClosed
 	}
 
 	queue.closed = true
 	return nil
 }
 
-var errClosed = errors.New("queue closed")
-var errOverflow = errors.New("queue overflow")
+var ErrClosed = errors.New("queue closed")
+var ErrOverFlow = errors.New("queue overflow")

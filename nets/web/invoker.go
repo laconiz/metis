@@ -20,7 +20,7 @@ type Node struct {
 }
 
 func NewInvoker(logger log.Logger) *Invoker {
-	return &Invoker{squirt: ioc.NewSquirt().Params(&gin.Context{}), logger: logger}
+	return &Invoker{squirt: ioc.NewSquirt(), logger: logger}
 }
 
 type Invoker struct {
@@ -42,7 +42,7 @@ func (invoker *Invoker) Register(router gin.IRouter, nodes []*Node) error {
 
 	for _, node := range nodes {
 		if err := invoker.RegisterNode(router, node); err != nil {
-			return err
+			return fmt.Errorf("register %v error: %w", node, err)
 		}
 	}
 
@@ -51,7 +51,7 @@ func (invoker *Invoker) Register(router gin.IRouter, nodes []*Node) error {
 
 func (invoker *Invoker) RegisterNode(router gin.IRouter, node *Node) error {
 
-	arguments, err := invoker.squirt.Unknown(node.Handler)
+	arguments, err := invoker.squirt.Params(&gin.Context{}).Unknown(node.Handler)
 	if err != nil {
 		return err
 	}
@@ -68,22 +68,22 @@ func (invoker *Invoker) RegisterNode(router gin.IRouter, node *Node) error {
 		}
 		invoker.squirt.Builder(arguments[0], invoker.bind(arguments[0]))
 	default:
-		return errors.New("invalid handler num in")
+		return fmt.Errorf("invalid handler num in %v", arguments)
 	}
 
-	handler, err := invoker.squirt.Handle(node.Handler)
+	handler, err := invoker.squirt.Params(&gin.Context{}).Handle(node.Handler)
 	if err != nil {
 		return err
 	}
 
-	invoker.logger.Data(node.Path, node.Method).Info("registered")
+	invoker.logger.Data("path", node.Path).Data("method", node.Method).Info("registered")
 	router.Handle(node.Method, node.Path, invoker.Handle(node, handler))
 	return nil
 }
 
 func (invoker *Invoker) Handle(node *Node, handler ioc.Invoker) gin.HandlerFunc {
 
-	logger := invoker.logger.Field("path", node.Path).Field("method", node.Method)
+	logger := invoker.logger.Data("path", node.Path).Data("method", node.Method)
 
 	return func(ctx *gin.Context) {
 
@@ -112,7 +112,9 @@ func (invoker *Invoker) Handle(node *Node, handler ioc.Invoker) gin.HandlerFunc 
 
 		entry = entry.Data("request", requests)
 		ctx.JSON(http.StatusOK, out[0].Interface())
-		entry.Data("response", responses).Info("execute success")
+		if node.Log {
+			entry.Data("response", responses).Info("execute success")
+		}
 	}
 }
 

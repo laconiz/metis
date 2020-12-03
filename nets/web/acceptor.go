@@ -13,7 +13,7 @@ func NewAcceptor(option *AcceptorOption, logger log.Logger) (*Acceptor, error) {
 
 	option.parse()
 
-	logger = logger.Level(option.Level)
+	logger = logger.Level(option.Level).Field("acceptor", option.Name)
 
 	engine := gin.New()
 	engine.Use(gin.Recovery())
@@ -37,6 +37,12 @@ func (acceptor *Acceptor) Running() bool {
 	acceptor.mutex.RLock()
 	defer acceptor.mutex.RUnlock()
 	return acceptor.running
+}
+
+func (acceptor *Acceptor) Engine() *gin.Engine {
+	acceptor.mutex.RLock()
+	defer acceptor.mutex.RUnlock()
+	return acceptor.listener.Handler.(*gin.Engine)
 }
 
 func (acceptor *Acceptor) Run() {

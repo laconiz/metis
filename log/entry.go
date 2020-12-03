@@ -7,27 +7,25 @@ import (
 	"time"
 )
 
-type Strap interface {
-	Enable(Level) bool
-	Invoke(*Log)
-}
-
-func New(strap Strap) Logger {
+// 创建日志接口
+func NewEntry(hooks ...*Hook) Logger {
 	return &Entry{
 		level:   DEBUG,
 		data:    context.New(),
 		context: context.New(),
-		strap:   strap,
+		hooks:   hooks,
 	}
 }
 
+// 日志接口
 type Entry struct {
-	level   Level
-	data    *context.Context
-	context *context.Context
-	strap   Strap
+	level   Level            // 等级
+	data    *context.Context // 数据
+	context *context.Context //
+	hooks   []*Hook          //
 }
 
+// 设置日志等级
 func (entry *Entry) Level(level Level) Logger {
 	copy := *entry
 	copy.level = level
@@ -93,29 +91,23 @@ func (entry *Entry) Fatalf(format string, args ...interface{}) {
 }
 
 func (entry *Entry) Log(level Level, args ...interface{}) {
-
-	if !entry.level.Enable(level) || !entry.strap.Enable(level) {
+	if !entry.level.Enable(level) {
 		return
 	}
-
 	entry.log(level, fmt.Sprint(args...))
 }
 
 func (entry *Entry) Logf(level Level, format string, args ...interface{}) {
-
-	if !entry.level.Enable(level) || !entry.strap.Enable(level) {
+	if !entry.level.Enable(level) {
 		return
 	}
-
 	entry.log(level, fmt.Sprintf(format, args...))
 }
 
+// 调用接口
 func (entry *Entry) log(level Level, message string) {
-	entry.strap.Invoke(&Log{
-		Level:   level,
-		Time:    time.Now(),
-		Data:    entry.data,
-		Context: entry.context,
-		Message: message,
-	})
+	log := &Log{Level: level, Time: time.Now(), Data: entry.data, Context: entry.context, Message: message}
+	for _, hook := range entry.hooks {
+		hook.Hook(log)
+	}
 }

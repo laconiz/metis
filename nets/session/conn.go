@@ -1,6 +1,9 @@
 package session
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Conn interface {
 	Addr() string
@@ -8,4 +11,5 @@ type Conn interface {
 	Read() ([]byte, error)
 	Write([]byte) error
 	Close() error
+	Data() *sync.Map
 }

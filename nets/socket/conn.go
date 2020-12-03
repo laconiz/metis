@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -59,4 +60,8 @@ func (conn *Conn) Write(stream []byte) error {
 
 func (conn *Conn) Close() error {
 	return conn.conn.Close()
+}
+
+func (conn *Conn) Data() *sync.Map {
+	return &sync.Map{}
 }

@@ -1,6 +1,7 @@
 package session
 
 import (
+	cellutil "github.com/davyxu/cellnet/util"
 	"github.com/laconiz/metis/log"
 	"github.com/laconiz/metis/nets/cipher"
 	"github.com/laconiz/metis/nets/encoder"
@@ -178,7 +179,7 @@ func (ses *Session) Invoke(event *event.Event) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			ses.logger.Data("error", err).Error("invoke panic")
+			ses.logger.Data("error", err).Errorf("invoke panic %s", cellutil.StackToString(5))
 		}
 	}()
 

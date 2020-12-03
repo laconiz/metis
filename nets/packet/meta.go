@@ -108,12 +108,7 @@ func MetaByName(name string) *Meta {
 }
 
 func MetaByType(typo reflect.Type) *Meta {
-	return typeMap[typo]
-}
 
-func MetaByMsg(msg interface{}) *Meta {
-
-	typo := reflect.TypeOf(msg)
 	if typo == nil {
 		return nil
 	}
@@ -122,7 +117,11 @@ func MetaByMsg(msg interface{}) *Meta {
 		typo = typo.Elem()
 	}
 
-	return MetaByType(typo)
+	return typeMap[typo]
+}
+
+func MetaByMsg(msg interface{}) *Meta {
+	return MetaByType(reflect.TypeOf(msg))
 }
 
 func MetaList() (ret []*Meta) {

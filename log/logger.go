@@ -22,3 +22,4 @@ type Logger interface {
 }
 
 const Module = "module"
+const Error = "error"

@@ -15,8 +15,8 @@ func NewSquirt() *Squirt {
 		params:    inject.New(),
 		builders:  map[reflect.Type]*Builder{},
 	}
-
 	squirt.params.SetParent(squirt.arguments)
+
 	return squirt
 }
 
@@ -89,6 +89,9 @@ func (squirt *Squirt) Builders(functions ...interface{}) *Squirt {
 func (squirt *Squirt) Params(params ...interface{}) *Squirt {
 
 	return squirt.execute(func() error {
+
+		squirt.params = inject.New()
+		squirt.params.SetParent(squirt.arguments)
 
 		for _, param := range params {
 			squirt.params.Map(param)

@@ -9,55 +9,74 @@ import (
 )
 
 // 从参数中获取合法的IP地址及端口
-func Address(name string, value string) (string, error) {
-
-	addr, ok := parse(name)
+func Address(name string, defaults string) (string, bool) {
+	value, ok := argument(name)
 	if !ok {
-		addr = value
+		value = defaults
 	}
-
-	items := strings.Split(addr, ":")
-	if len(items) != 2 {
-		return "", fmt.Errorf("invalid address[%s]", addr)
+	array := strings.Split(value, ":")
+	if len(array) != 2 {
+		return "", false
 	}
-
-	if ip := net.ParseIP(items[0]); ip == nil {
-		return "", fmt.Errorf("invalid ip[%s]", items[0])
+	if ip := net.ParseIP(array[0]); ip == nil {
+		return "", false
 	}
-
-	port, err := strconv.Atoi(items[1])
+	port, err := strconv.Atoi(array[1])
 	if err != nil || port < 0 || port > 65535 {
-		return "", fmt.Errorf("invalid port[%s]", items[1])
+		return "", false
 	}
-
-	return addr, nil
+	return value, true
 }
 
-func String(name string, value string) string {
-	if str, ok := parse(name); ok {
+func String(name string, defaults string) string {
+	if str, ok := argument(name); ok {
 		return str
 	}
-	return value
+	return defaults
 }
 
-func parse(name string) (string, bool) {
+func Bool(name string) bool {
+	value, ok := argument(name)
+	if !ok {
+		return false
+	}
+	if value == "" {
+		return true
+	}
+	boolean, err := strconv.ParseBool(value)
+	if err != nil {
+		return false
+	}
+	return boolean
+}
 
-	unix := "-" + name
-	gnu := "--" + name
-
-	for index, arg := range os.Args {
-
-		if arg == unix && index+1 < len(os.Args) {
-			return os.Args[index+1], true
-		}
-
-		if strings.HasPrefix(arg, gnu) {
-			sp := strings.SplitN(arg, "=", 1)
-			if len(sp) == 2 {
-				return sp[1], true
+func argument(name string) (string, bool) {
+	for index, argument := range arguments {
+		// -name | --name
+		if argument == "-"+name || argument == "--"+name {
+			if index+1 >= len(arguments) {
+				return "", true
 			}
+			value := arguments[index+1]
+			if strings.HasPrefix(value, "-") {
+				return "", true
+			}
+			if strings.HasPrefix(value, "--") {
+				return "", true
+			}
+			return value, true
+		}
+		// -name=
+		if strings.HasPrefix(argument, fmt.Sprintf("-%s=", name)) {
+			return strings.SplitN(argument, "=", 2)[1], true
+		}
+		// --name=
+		if strings.HasPrefix(argument, "--"+name+"=") {
+			return strings.SplitN(argument, "=", 2)[1], true
 		}
 	}
-
+	// 没有查找到参数
 	return "", false
 }
+
+var arguments = os.Args

@@ -24,10 +24,18 @@ type Client struct {
 	*api.Client
 }
 
+func (client *Client) Address() string {
+	return client.addr
+}
+
 func (client *Client) KV() *KV {
 	return &KV{kv: client.Client.KV()}
 }
 
 func (client *Client) Watcher() *Watcher {
 	return &Watcher{client: client}
+}
+
+func (client *Client) Register() *Register {
+	return &Register{client: client}
 }

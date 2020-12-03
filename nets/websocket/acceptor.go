@@ -9,15 +9,19 @@ import (
 	"github.com/laconiz/metis/nets/queue"
 	"github.com/laconiz/metis/nets/session"
 	"net/http"
+	"sync"
 )
 
-func Acceptor(limit int64) acceptor.Dialer {
+type Verifier func(*gin.Context) (*sync.Map, bool)
+
+func Acceptor(limit int64, verifier Verifier) acceptor.Dialer {
 
 	return func(addr string) (acceptor.Listener, error) {
 
 		listener := &Listener{
-			limit: limit,
-			queue: queue.New(capacity),
+			limit:    limit,
+			queue:    queue.New(capacity),
+			verifier: verifier,
 		}
 
 		engine := gin.New()
@@ -36,9 +40,10 @@ func Acceptor(limit int64) acceptor.Dialer {
 
 // 侦听器
 type Listener struct {
-	limit  int64        // 读取限制
-	queue  *queue.Queue // 会话队列
-	server *http.Server // HTTP服务
+	limit    int64        // 读取限制
+	queue    *queue.Queue // 会话队列
+	server   *http.Server // HTTP服务
+	verifier Verifier
 }
 
 // 获取会话
@@ -68,6 +73,14 @@ func (listener *Listener) Close() error {
 // 升级会话
 func (listener *Listener) upgrade(context *gin.Context) {
 
+	ok := true
+	data := &sync.Map{}
+	if listener.verifier != nil {
+		if data, ok = listener.verifier(context); !ok {
+			return
+		}
+	}
+
 	request := context.Request
 
 	// 升级会话
@@ -86,7 +99,7 @@ func (listener *Listener) upgrade(context *gin.Context) {
 	}
 
 	// 插入会话队列
-	listener.queue.Push(&Conn{conn: conn, addr: addr})
+	listener.queue.Push(&Conn{conn: conn, addr: addr, data: data})
 }
 
 // 升级器

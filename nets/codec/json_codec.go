@@ -1,11 +1,20 @@
 package codec
 
-import "github.com/laconiz/metis/utils/json"
+import (
+	"github.com/laconiz/metis/utils/json"
+)
+
+type patcher interface {
+	Patch()
+}
 
 type jsonCodec struct {
 }
 
 func (codec *jsonCodec) Encode(msg interface{}) ([]byte, error) {
+	if patcher, ok := msg.(patcher); ok {
+		patcher.Patch()
+	}
 	return json.Marshal(msg)
 }
 

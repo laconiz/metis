@@ -1,9 +1,8 @@
-package formatter
+package log
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/laconiz/metis/log"
 )
 
 func Text() *TextFormatter {
@@ -18,7 +17,7 @@ func (formatter *TextFormatter) TimeLayout(layout string) *TextFormatter {
 	return &TextFormatter{timeLayout: layout}
 }
 
-func (formatter *TextFormatter) Format(log *log.Log) ([]byte, error) {
+func (formatter *TextFormatter) Format(log *Log) ([]byte, error) {
 
 	var buf bytes.Buffer
 
@@ -46,17 +45,17 @@ func (formatter *TextFormatter) Format(log *log.Log) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (formatter *TextFormatter) Level(level log.Level) string {
+func (formatter *TextFormatter) Level(level Level) string {
 	switch level {
-	case log.DEBUG:
+	case DEBUG:
 		return "[DEBUG]"
-	case log.INFO:
+	case INFO:
 		return "[INFO] "
-	case log.WARN:
+	case WARN:
 		return "[WARN] "
-	case log.ERROR:
+	case ERROR:
 		return "[ERROR]"
-	case log.FATAL:
+	case FATAL:
 		return "[FATAL]"
 	default:
 		const format = "[UNKNOWN<%d>]"

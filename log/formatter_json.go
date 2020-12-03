@@ -1,7 +1,6 @@
-package formatter
+package log
 
 import (
-	"github.com/laconiz/metis/log"
 	"github.com/laconiz/metis/utils/json"
 )
 
@@ -25,7 +24,7 @@ func (formatter *JsonFormatter) TimeLayout(layout string) *JsonFormatter {
 	return &JsonFormatter{timeLayout: layout}
 }
 
-func (formatter *JsonFormatter) Format(log *log.Log) ([]byte, error) {
+func (formatter *JsonFormatter) Format(log *Log) ([]byte, error) {
 
 	var layout string
 	if formatter.timeLayout != "" {
